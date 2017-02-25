@@ -97,8 +97,8 @@ class Percussion extends PerMeasureProceeding {
 }
 
 class Melody extends PerMeasureProceeding {
-    fun int getFrequency(int i) {
-        return 440 * 2^(i / 12);
+    fun float getFrequency(int i) {
+        return 440 * Math.pow(2, (i / 12));
     }
     
     fun void proceed(TimeSignature ts) {
