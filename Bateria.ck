@@ -3,38 +3,82 @@ class PerMeasureProceeding {
     fun void proceed(TimeSignature ts) {};
 }
 
-class TimeSignatureEvent extends Event {
+class TimeEvent extends Event {
     int isStrong;
+}
+
+class TimeEventPerFraction {
+    float timeFraction;
+    TimeEvent event;
 }
 
 class TimeSignature {
     int beatsPerMeasure[];
     int beatNoteValue;
     int bpmForQuarterNotes;
+    int levels;
     
-    TimeSignatureEvent timeSignatureEvent;
-    Event silence;
+    TimeEventPerFraction timeEventPerFraction[100];
 
+    fun void initTimeSignatureEvents(int levels) {
+        levels => this.levels;
+        
+        TimeEventPerFraction tepf;
+        1.0 => tepf.timeFraction;
+        TimeEvent e @=> tepf.event;
+        
+        <<< tepf.timeFraction + ", " + tepf.event >>>;
+        tepf @=> this.timeEventPerFraction[0];
+
+        for (1 => int i; i < levels; ++i) {
+          TimeEventPerFraction tepf;
+          this.timeEventPerFraction[i - 1].timeFraction / 2 => tepf.timeFraction;
+          TimeEvent e @=> tepf.event;
+          
+          <<< tepf.timeFraction + ", " + tepf.event >>>;
+          tepf  @=> this.timeEventPerFraction[i];
+        }
+    }
+            
+    
     fun void advanceTime() {
         60000 / bpmForQuarterNotes => int delayTimeMs;
         delayTimeMs / (beatNoteValue / 4) => delayTimeMs;
 
-        delayTimeMs / 16 => int timePreBeat;
-        (delayTimeMs * 15) / 16 => int timePostBeat;
+        delayTimeMs * this.timeEventPerFraction[this.levels - 1].timeFraction => float step;
         
-        for (0 => int j; j < beatsPerMeasure.cap(); j + 1 => j) {
-            for (0 => int k; k < beatsPerMeasure[j]; k + 1 => k) {
-                0 => timeSignatureEvent.isStrong;
-                
-                if (k == 0) {
-                   1 => timeSignatureEvent.isStrong;
+        Math.pow(2, this.levels - 1) => float stepNr;
+        stepNr / 2 => float cutPosition;
+        
+        for (0 => int i; i < this.beatsPerMeasure.cap(); ++i) {
+            for (0 => int j; j < this.beatsPerMeasure[i] + 1; ++j) {
+                for (1 => int k; k < stepNr + 1; ++k) {
+                    this.timeEventPerFraction[this.levels - 1] @=> TimeEventPerFraction tepf;
+
+                    <<< "Emiting k=" + k + " - " + tepf.timeFraction + ", " + tepf.event >>>;
+                    tepf.event.broadcast();
+                    
+                    if (k % cutPosition == 0) {
+                        for (this.levels - 2 => int l; l > 0; --l) {
+                            this.timeEventPerFraction[l] @=> tepf;
+                            <<< "Emiting k=" + k + " - " + tepf.timeFraction + ", " + tepf.event >>>;
+                            tepf.event.broadcast();
+                        }
+                    } else if (k % 2 == 0) {
+                        k % cutPosition => float normalizedIndex;
+                        tepf.timeFraction * normalizedIndex => float finalTimeFraction;
+                        
+                        for (this.levels -2 => int l; (l > 0 && this.timeEventPerFraction[l].timeFraction <= finalTimeFraction); --l) {
+                            this.timeEventPerFraction[l] @=> tepf;
+                            <<< "Emiting k=" + k + " - " + tepf.timeFraction + ", " + tepf.event >>>;
+                            tepf.event.broadcast();
+                        }
+                    }
+                    
+                    step::ms => now;
                 }
-
-                timePreBeat::ms => now;
-                timeSignatureEvent.broadcast();                
-                timePostBeat::ms => now;
-
-                silence.broadcast();
+                
+                this.timeEventPerFraction[0].event.broadcast();
             }
         }
     }
@@ -43,16 +87,11 @@ class TimeSignature {
 class Percussion extends PerMeasureProceeding {    
    fun void proceed(TimeSignature ts) {
         while (true) {
-            ts.timeSignatureEvent => now;
+            ts.timeEventPerFraction[0].event => now;
 
             Impulse i => dac;
             1.0 => i.gain;
-            0.2 => i.next;
-            if (ts.timeSignatureEvent.isStrong == 1) {
-                1.0 => i.next;
-            }
-            
-            ts.silence => now;
+            1.0 => i.next;
         }
     }
 }
@@ -65,16 +104,6 @@ class Melody extends PerMeasureProceeding {
     fun void proceed(TimeSignature ts) {
         SinOsc sinOsc;
         0.5 => sinOsc.gain;
-        
-        while (true) {
-            getFrequency(Math.random()) => sinOsc.freq;
-            
-            ts.timeSignatureEvent => now;
-            sinOsc => dac;
-
-            ts.silence => now;
-            sinOsc =< dac;
-        }
     }
 }
 
@@ -91,18 +120,17 @@ class Measure {
     }
 }
 
-while (true) {
-    TimeSignature ts;
-    [3, 3] @=> ts.beatsPerMeasure;
-    8 => ts.beatNoteValue;
-    120 => ts.bpmForQuarterNotes;
+TimeSignature ts;
+[6] @=> ts.beatsPerMeasure;
+8 => ts.beatNoteValue;
+60 => ts.bpmForQuarterNotes;
+ts.initTimeSignatureEvents(4);
 
-    Measure m;
-    ts @=> m.ts;
+Measure m;
+ts @=> m.ts;
 
-    Percussion p;
-    Melody mel;
-    [p, mel] @=> m.players;
+Percussion p;
+Melody mel;
+[p, mel] @=> m.players;
 
-    m.advanceTime();
-}
+m.advanceTime();
