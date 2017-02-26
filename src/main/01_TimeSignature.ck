@@ -1,3 +1,5 @@
+// Machine.add(me.dir() + "/TimeEvent.ck");
+
 class TimeEventPerFraction {
     float timeFraction;
     TimeEvent event;

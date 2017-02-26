@@ -1,0 +1,38 @@
+<project name="ChuckLib" default="run-test" basedir=".">
+  <property name="src" location="src/main"/>
+  <property name="test" location="src/test"/>
+  <property name="build" location="build"/>
+  <property name="run-test-dir" value="test"/>
+  
+  <target name="clean">
+    <delete dir="${build}"/>
+    <delete dir="${run-test-dir}"/>
+  </target>
+  
+  <target name="init">
+    <tstamp/>
+    <mkdir dir="${build}"/>
+	<mkdir dir="${run-test-dir}"/>
+  </target>
+
+  <target name="compile" depends="clean,init">
+    <concat destfile="${build}/ChuckLib.ck">
+      <fileset dir="${src}" includes="*.ck"/>
+    </concat>
+  </target>
+
+  <target name="build" depends="clean,init,compile"/>
+  
+  <target name="run-test" depends="build">
+    <concat destfile="${run-test-dir}/test.ck">
+      <fileset dir="${build}" includes="ChuckLib.ck"/>
+	  <fileset dir="${test}" includes="test.ck"/>
+    </concat>
+
+	
+	
+    <exec executable="chuck">
+	  <arg value="${run-test-dir}/test.ck"/>
+    </exec>
+  </target>
+</project>

@@ -1,5 +1,5 @@
-Machine.add(me.dir() + "/lib/PerMeasureProceeding.ck");
-Machine.add(me.dir() + "/lib/TimeSignature.ck");
+// Machine.add(me.dir() + "/lib/PerMeasureProceeding.ck");
+// Machine.add(me.dir() + "/lib/TimeSignature.ck");
 
 class Melody extends PerMeasureProceeding {
     fun float getFrequency(int i) {
