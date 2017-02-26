@@ -1,12 +1,3 @@
-// I don't know how to declare an interface ¬¬
-class PerMeasureProceeding {
-    fun void proceed(TimeSignature ts) {};
-}
-
-class TimeEvent extends Event {
-    int isStrong;
-}
-
 class TimeEventPerFraction {
     float timeFraction;
     TimeEvent event;
@@ -20,6 +11,7 @@ class TimeSignature {
     
     TimeEventPerFraction timeEventPerFraction[100];
 
+    /* Constraint: 1 <= levels <= 100 */
     fun void initTimeSignatureEvents(int levels) {
         levels => this.levels;
         
@@ -27,7 +19,7 @@ class TimeSignature {
         1.0 => tepf.timeFraction;
         TimeEvent e @=> tepf.event;
         
-        <<< tepf.timeFraction + ", " + tepf.event >>>;
+        <<< "Initializing " + tepf.timeFraction + ", " + tepf.event >>>;
         tepf @=> this.timeEventPerFraction[0];
 
         for (1 => int i; i < levels; ++i) {
@@ -35,12 +27,12 @@ class TimeSignature {
           this.timeEventPerFraction[i - 1].timeFraction / 2 => tepf.timeFraction;
           TimeEvent e @=> tepf.event;
           
-          <<< tepf.timeFraction + ", " + tepf.event >>>;
-          tepf  @=> this.timeEventPerFraction[i];
+          <<< "Initializing " + tepf.timeFraction + ", " + tepf.event >>>;
+          tepf @=> this.timeEventPerFraction[i];
         }
     }
             
-    
+    /* Emits all registered beat signals in broadcast */
     fun void advanceTime() {
         60000 / bpmForQuarterNotes => int delayTimeMs;
         delayTimeMs / (beatNoteValue / 4) => delayTimeMs;
@@ -51,7 +43,7 @@ class TimeSignature {
         stepNr / 2 => float cutPosition;
         
         for (0 => int i; i < this.beatsPerMeasure.cap(); ++i) {
-            for (0 => int j; j < this.beatsPerMeasure[i] + 1; ++j) {
+            for (0 => int j; j <= this.beatsPerMeasure[i]; ++j) {
                 for (1 => int k; k < stepNr + 1; ++k) {
                     this.timeEventPerFraction[this.levels - 1] @=> TimeEventPerFraction tepf;
 
@@ -83,54 +75,3 @@ class TimeSignature {
         }
     }
 }
-
-class Percussion extends PerMeasureProceeding {    
-   fun void proceed(TimeSignature ts) {
-        while (true) {
-            ts.timeEventPerFraction[0].event => now;
-
-            Impulse i => dac;
-            1.0 => i.gain;
-            1.0 => i.next;
-        }
-    }
-}
-
-class Melody extends PerMeasureProceeding {
-    fun float getFrequency(int i) {
-        return 440 * Math.pow(2, (i / 12));
-    }
-    
-    fun void proceed(TimeSignature ts) {
-        SinOsc sinOsc;
-        0.5 => sinOsc.gain;
-    }
-}
-
-class Measure {
-    TimeSignature ts;
-    PerMeasureProceeding players[];
-    
-    fun void advanceTime() {
-        for (0 => int i; i < players.cap(); i + 1 => i) {
-            spork ~ players[i].proceed(this.ts);
-        }
-        
-        ts.advanceTime();
-    }
-}
-
-TimeSignature ts;
-[6] @=> ts.beatsPerMeasure;
-8 => ts.beatNoteValue;
-60 => ts.bpmForQuarterNotes;
-ts.initTimeSignatureEvents(4);
-
-Measure m;
-ts @=> m.ts;
-
-Percussion p;
-Melody mel;
-[p, mel] @=> m.players;
-
-m.advanceTime();
