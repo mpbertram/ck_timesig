@@ -1,4 +1,4 @@
-// Machine.add(me.dir() + "/TimeEvent.ck");
+/* TimeSignature.ck */
 
 class TimeEventPerFraction {
     float timeFraction;

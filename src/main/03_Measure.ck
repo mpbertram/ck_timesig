@@ -1,5 +1,4 @@
-// Machine.add(me.dir() + "/PerMeasureProceeding.ck");
-// Machine.add(me.dir() + "/TimeSignature.ck");
+/* Measure.ck */
 
 class Measure {
     TimeSignature ts;
