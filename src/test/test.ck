@@ -1,9 +1,4 @@
-// Machine.add(me.dir() + "/lib/PerMeasureProceeding.ck");
-// Machine.add(me.dir() + "/lib/TimeSignature.ck");
-// Machine.add(me.dir() + "/lib/Measure.ck");
-
-// Machine.add(me.dir() + "/Percussion.ck");
-// Machine.add(me.dir() + "/Melody.ck");
+/* test.ck */
 
 TimeSignature ts;
 [6] @=> ts.beatsPerMeasure;
