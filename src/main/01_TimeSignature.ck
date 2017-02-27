@@ -1,19 +1,32 @@
 /* TimeSignature.ck */
 
+/* 
+ * Describes the events which are generated in each time fraction;
+ * e.g. - [1.0, Event] describes the event which is broadcast when a full beat comes.
+ *      - [0.5, Event] describes the event which is broadcast when a half time beat comes.
+ */
 class TimeEventPerFraction {
     float timeFraction;
     TimeEvent event;
 }
 
+/* 
+ * Description of a time singature. This class is used a time signature definition for a measure.
+ * The caller must decide how detailed must be the time events of the signature, which is defined
+ * as 'levels'. The more levels, the more detailed the time events are going to be, and listeners 
+ * may be registered to the smallest time fraction events. On the other hand, more events will be
+ * generated, which makes execution more complex.
+ */
 class TimeSignature {
+    100 => int timeEventLevelLimit;
+    
     int beatsPerMeasure[];
     int beatNoteValue;
     int bpmForQuarterNotes;
     int levels;
     
-    TimeEventPerFraction timeEventPerFraction[100];
+    TimeEventPerFraction timeEventPerFraction[this.timeEventLevelLimit];
 
-    /* Constraint: 1 <= levels <= 100 */
     fun void initTimeSignatureEvents(int levels) {
         levels => this.levels;
         
@@ -33,19 +46,24 @@ class TimeSignature {
           tepf @=> this.timeEventPerFraction[i];
         }
     }
-            
+     
+    fun Event getEvent(int level) {
+        return this.timeEventPerFraction[level].event;
+    }
+    
     /* Emits all registered beat signals in broadcast */
     fun void advanceTime() {
         60000 / bpmForQuarterNotes => int delayTimeMs;
         delayTimeMs / (beatNoteValue / 4) => delayTimeMs;
 
         delayTimeMs * this.timeEventPerFraction[this.levels - 1].timeFraction => float step;
-        
         Math.pow(2, this.levels - 1) => float stepNr;
         stepNr / 2 => float cutPosition;
         
         for (0 => int i; i < this.beatsPerMeasure.cap(); ++i) {
             for (0 => int j; j <= this.beatsPerMeasure[i]; ++j) {
+                this.timeEventPerFraction[0].event.broadcast();
+                
                 for (1 => int k; k < stepNr + 1; ++k) {
                     this.timeEventPerFraction[this.levels - 1] @=> TimeEventPerFraction tepf;
 
@@ -71,8 +89,6 @@ class TimeSignature {
                     
                     step::ms => now;
                 }
-                
-                this.timeEventPerFraction[0].event.broadcast();
             }
         }
     }
