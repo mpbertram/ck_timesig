@@ -1,15 +1,15 @@
 /* SinOscFrequencyGenerator.ck */
 
 class SinOscFrequencyGenerator extends MeasureListener {
-    SinOsc sinOsc;
+    SinOsc sinOsc[];
     
     10 => int uGenLimit;
     0 => int uGenCount;
     UGen uGens[this.uGenLimit];
     
-    fun float frequency(int i) {
-        return 440 * Math.pow(2, (i / 12));
-    }
+    fun void init(int numberOfSinOscs) {
+		SinOsc sinOsc[numberOfSinOscs] @=> this.sinOsc;
+	}
     
     fun void addUGen(UGen uGen) {
         if (this.uGenCount < this.uGenLimit) {
@@ -29,35 +29,56 @@ class SinOscFrequencyGenerator extends MeasureListener {
     
     fun void enable() {
         if (this.uGenCount > 0) {
-            <<< "Chucking " + this.sinOsc + " to " + this.uGens[0] >>>;
-            this.sinOsc => this.uGens[0];
+            chuckSinOscToUGen(this.uGens[0]);
             
             <<< "Chucking " + this.uGens[this.uGenCount - 1] + " to dac" >>>;
             this.uGens[this.uGenCount - 1] => dac; 
         } else {
-            <<< "Chucking " + this.sinOsc + " to dac" >>>;
-            this.sinOsc => dac;
+            chuckSinOscToUGen(dac);
         }
     }
     
     fun void disable() {
         if (this.uGenCount > 0) {
-            <<< "Unchucking " + this.sinOsc + " from " + this.uGens[0] >>>;
-            this.sinOsc =< this.uGens[0];
+            unchuckSinOscFromUGen(this.uGens[0]);
             
             <<< "Unchucking " + this.uGens[this.uGenCount - 1] + " from dac" >>>;
             this.uGens[this.uGenCount - 1] =< dac;
         } else {
-            <<< "Unchucking " + this.sinOsc + " to dac" >>>;
-            this.sinOsc =< dac;
+            unchuckSinOscFromUGen(dac);
         }
     }
     
-    fun void setGain(float gain) {
-        gain => this.sinOsc.gain;
+    fun void setGain(int sinOscIndex, float gain) {
+        if (sinOscIndex < 1) {
+			<<< "Parameter sinOscIndex must be > 0. Not setting anything." >>>;
+			return;
+		}
+		
+		gain => this.sinOsc[sinOscIndex - 1].gain;
     }
     
-    fun void setFrequency(float frequency) {
-        frequency => this.sinOsc.freq;
+    fun void setFrequency(int sinOscIndex, float frequency) {
+        if (sinOscIndex < 1) {
+			<<< "Parameter sinOscIndex must be > 0. Not setting anything." >>>;
+			return;
+		}
+
+		frequency => this.sinOsc[sinOscIndex - 1].freq;
     }
+	
+	fun void chuckSinOscToUGen(UGen uGen) {
+		for (0 => int i; i < this.sinOsc.cap(); ++i) {
+            <<< "Chucking " + this.sinOsc[i] + " to UGen " + this.uGens[0] >>>;		
+			1.0 / this.sinOsc.cap() => this.sinOsc[i].gain;
+			this.sinOsc[i] => uGen;
+		}
+	}
+
+	fun void unchuckSinOscFromUGen(UGen uGen) {
+		for (0 => int i; i < this.sinOsc.cap(); ++i) {
+			<<< "Unchucking " + this.sinOsc[i] + " from UGen " + uGen >>>;
+			this.sinOsc[i] =< uGen;
+		}
+	}
 }
