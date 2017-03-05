@@ -2,17 +2,17 @@
 
 class SinOscPerformer extends MeasureListener {
     SinOscFrequencyGenerator sofg;
-    sofg.setFrequency(440.0);
+	sofg.init(2);
+	sofg.setFrequency(1, 440.0);
+	sofg.setFrequency(2, 555.0);
     
-    Gain g1;
-    0.2 => g1.gain;
+    Gain g;
+    0.5 => g.gain;
     
-    Gain g2;
-    0.2 => g2.gain;
+    JCRev rev;
     
-	sofg.addUGen(g1);
-    sofg.addUGen(g2);
-    
+	sofg.addUGen(g);
+    sofg.addUGen(rev);
     
     fun void perform() {
         while (true) {
