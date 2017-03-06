@@ -11,7 +11,7 @@ class TimeEventPerFraction {
 }
 
 /* 
- * Description of a time singature. This class is used a time signature definition for a measure.
+ * Description of a time signature. This class is used a time signature definition for a measure.
  * The caller must decide how detailed must be the time events of the signature, which is defined
  * as 'levels'. The more levels, the more detailed the time events are going to be, and listeners 
  * may be registered to the smallest time fraction events. On the other hand, more events will be
@@ -67,13 +67,13 @@ class TimeSignature {
                 for (1 => int k; k < stepNr + 1; ++k) {
                     this.timeEventPerFraction[this.levels - 1] @=> TimeEventPerFraction tepf;
 
-                    <<< "Emiting k=" + k + " - " + tepf.timeFraction + ", " + tepf.event >>>;
+                    <<< "Emitting k=" + k + " - " + tepf.timeFraction + ", " + tepf.event >>>;
                     tepf.event.broadcast();
                     
                     if (k % cutPosition == 0) {
                         for (this.levels - 2 => int l; l > 0; --l) {
                             this.timeEventPerFraction[l] @=> tepf;
-                            <<< "Emiting k=" + k + " - " + tepf.timeFraction + ", " + tepf.event >>>;
+                            <<< "Emitting k=" + k + " - " + tepf.timeFraction + ", " + tepf.event >>>;
                             tepf.event.broadcast();
                         }
                     } else if (k % 2 == 0) {
@@ -82,7 +82,7 @@ class TimeSignature {
                         
                         for (this.levels -2 => int l; (l > 0 && this.timeEventPerFraction[l].timeFraction <= finalTimeFraction); --l) {
                             this.timeEventPerFraction[l] @=> tepf;
-                            <<< "Emiting k=" + k + " - " + tepf.timeFraction + ", " + tepf.event >>>;
+                            <<< "Emitting k=" + k + " - " + tepf.timeFraction + ", " + tepf.event >>>;
                             tepf.event.broadcast();
                         }
                     }
