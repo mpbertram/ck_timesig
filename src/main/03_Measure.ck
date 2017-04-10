@@ -20,10 +20,18 @@ class Measure {
     } 
     
     fun void advanceTime() {
-        for (0 => int i; i < measureListeners.cap(); ++i) {
-            spork ~ measureListeners[i].perform();
+        Shred shreds[this.registeredListenersCount];
+		
+		for (0 => int i; i < this.registeredListenersCount; ++i) {
+			spork ~ measureListeners[i].perform() @=> shreds[i];
+			<<< "Sporked shred " + shreds[i] >>>;
         }
         
         ts.advanceTime();
+		
+		for (0 => int i; i < this.registeredListenersCount; ++i) {
+			<<< "Killing shred " + shreds[i] >>>;
+			shreds[i].exit();
+		}
     }
 }
