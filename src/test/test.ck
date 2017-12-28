@@ -25,10 +25,22 @@ class SinOscPerformer extends MeasureListener {
     }
 }
 
-class ImpulsePerformer extends MeasureListener {    
+class ImpulsePerformerFullBeat extends MeasureListener {
    fun void perform() {
         while (true) {
-            wait(0);
+            wait(1);
+
+            Impulse i => dac;
+            1.0 => i.gain;
+            1.0 => i.next;
+        }
+    }
+}
+
+class ImpulsePerformerHalfBeat extends MeasureListener {
+   fun void perform() {
+        while (true) {
+            wait(1);
 
             Impulse i => dac;
             1.0 => i.gain;
@@ -38,18 +50,20 @@ class ImpulsePerformer extends MeasureListener {
 }
 
 TimeSignature ts;
-[6] @=> ts.beatsPerMeasure;
-8 => ts.beatNoteValue;
-60 => ts.bpmForQuarterNotes;
+[4] @=> ts.beatsPerMeasure;
+4 => ts.beatNoteValue;
+120 => ts.bpm;
 ts.initTimeSignatureEvents(4);
 
 Measure m;
 ts @=> m.ts;
 
-ImpulsePerformer ip;
+ImpulsePerformerFullBeat ipfb;
+ImpulsePerformerHalfBeat iphb;
 SinOscPerformer sop;
 
-m.register(ip);
+m.register(ipfb);
+// m.register(iphb);
 m.register(sop);
 
 m.advanceTime();

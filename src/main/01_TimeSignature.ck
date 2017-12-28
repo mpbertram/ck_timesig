@@ -1,8 +1,8 @@
 /* TimeSignature.ck */
 
 /* 
- * Describes the events which are generated in each time fraction;
- * e.g. - [1.0, Event] describes the event which is broadcast when a full beat comes.
+ * Describes the events which are generated in each time fraction; e.g.: 
+ *		- [1.0, Event] describes the event which is broadcast when a full time beat comes.
  *      - [0.5, Event] describes the event which is broadcast when a half time beat comes.
  */
 class TimeEventPerFraction {
@@ -10,19 +10,19 @@ class TimeEventPerFraction {
     TimeEvent event;
 }
 
-/* 
- * Description of a time signature. This class is used a time signature definition for a measure.
- * The caller must decide how detailed must be the time events of the signature, which is defined
- * as 'levels'. The more levels, the more detailed the time events are going to be, and listeners 
- * may be registered to the smallest time fraction events. On the other hand, more events will be
- * generated, which makes execution more complex.
+/*
+ * Time signature definition for a measure.
+ * 
+ * The caller must decide how detailed the time events of the signature must be, which is defined
+ * as 'levels'. The more levels, the more detailed the time events will to be. On the other hand, 
+ * more events will be generated, which makes execution more complex.
  */
 class TimeSignature {
     100 => int timeEventLevelLimit;
     
     int beatsPerMeasure[];
     int beatNoteValue;
-    int bpmForQuarterNotes;
+    int bpm;
     int levels;
     
     TimeEventPerFraction timeEventPerFraction[this.timeEventLevelLimit];
@@ -51,20 +51,16 @@ class TimeSignature {
         return this.timeEventPerFraction[level].event;
     }
     
-    /* Emits all registered beat signals in broadcast */
     fun void advanceTime() {
-        60000 / bpmForQuarterNotes => int delayTimeMs;
-        delayTimeMs / (beatNoteValue / 4) => delayTimeMs;
+        240000 / bpm / beatNoteValue => float delayTimeMs;
 
-        delayTimeMs * this.timeEventPerFraction[this.levels - 1].timeFraction => float step;
-        Math.pow(2, this.levels - 1) => float stepNr;
-        stepNr / 2 => float cutPosition;
+        delayTimeMs * timeEventPerFraction[levels - 1].timeFraction => float step;
+        Math.pow(2, this.levels - 1) => float numberOfSteps;
+        numberOfSteps / 2 => float cutPosition;
         
         for (0 => int i; i < this.beatsPerMeasure.cap(); ++i) {
-            for (0 => int j; j <= this.beatsPerMeasure[i]; ++j) {
-                this.timeEventPerFraction[0].event.broadcast();
-                
-                for (1 => int k; k < stepNr + 1; ++k) {
+            for (0 => int j; j < this.beatsPerMeasure[i]; ++j) {
+                for (1 => int k; k < numberOfSteps + 1; ++k) {
                     this.timeEventPerFraction[this.levels - 1] @=> TimeEventPerFraction tepf;
 
                     <<< "Emitting k=" + k + " - " + tepf.timeFraction + ", " + tepf.event >>>;
@@ -80,13 +76,18 @@ class TimeSignature {
                         k % cutPosition => float normalizedIndex;
                         tepf.timeFraction * normalizedIndex => float finalTimeFraction;
                         
-                        for (this.levels -2 => int l; (l > 0 && this.timeEventPerFraction[l].timeFraction <= finalTimeFraction); --l) {
+                        for (this.levels - 2 => int l; (l > 0 && this.timeEventPerFraction[l].timeFraction <= finalTimeFraction); --l) {
                             this.timeEventPerFraction[l] @=> tepf;
                             <<< "Emitting k=" + k + " - " + tepf.timeFraction + ", " + tepf.event >>>;
                             tepf.event.broadcast();
                         }
                     }
                     
+					if (k == numberOfSteps) {
+						<<< "Emitting full time event: " + getEvent(0) >>>;
+						getEvent(0).broadcast();
+					}
+					
                     step::ms => now;
                 }
             }
