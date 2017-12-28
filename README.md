@@ -11,3 +11,8 @@ TimeSignature ts;
 120 => ts.bpm;
 ```
 is equivalent to a 4/4 time signature à 120 BPM.
+
+## Building the lib
+```
+ant build
+```
