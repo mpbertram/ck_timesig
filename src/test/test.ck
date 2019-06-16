@@ -15,11 +15,11 @@ class SinOscPerformer extends MeasureListener {
     sofg.addUGen(rev);
     
     fun void perform() {
-        while (true) {
-            wait(0);
-            sofg.enable();
-            
-            wait(1);
+		while (true) {
+			waitFullBeat();
+			sofg.enable();
+
+            waitHalfBeat();
             sofg.disable();
         }
     }
@@ -28,7 +28,7 @@ class SinOscPerformer extends MeasureListener {
 class ImpulsePerformerFullBeat extends MeasureListener {
    fun void perform() {
         while (true) {
-            wait(1);
+            waitFullBeat();
 
             Impulse i => dac;
             1.0 => i.gain;
@@ -40,7 +40,7 @@ class ImpulsePerformerFullBeat extends MeasureListener {
 class ImpulsePerformerHalfBeat extends MeasureListener {
    fun void perform() {
         while (true) {
-            wait(1);
+            waitHalfBeat();
 
             Impulse i => dac;
             1.0 => i.gain;
@@ -52,8 +52,8 @@ class ImpulsePerformerHalfBeat extends MeasureListener {
 TimeSignature ts;
 [4] @=> ts.beatsPerMeasure;
 4 => ts.beatNoteValue;
-120 => ts.bpm;
-ts.initTimeSignatureEvents(4);
+60 => ts.bpm;
+ts.init(4);
 
 Measure m;
 ts @=> m.ts;
@@ -62,8 +62,8 @@ ImpulsePerformerFullBeat ipfb;
 ImpulsePerformerHalfBeat iphb;
 SinOscPerformer sop;
 
-m.register(ipfb);
-// m.register(iphb);
+// m.register(ipfb);
+m.register(iphb);
 m.register(sop);
 
 m.advanceTime();

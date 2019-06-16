@@ -27,7 +27,7 @@ class TimeSignature {
     
     TimeEventPerFraction timeEventPerFraction[this.timeEventLevelLimit];
 
-    fun void initTimeSignatureEvents(int levels) {
+    fun void init(int levels) {
         levels => this.levels;
         
         TimeEventPerFraction tepf;

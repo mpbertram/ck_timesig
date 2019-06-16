@@ -1,9 +1,16 @@
 # ck_timesig
 A ChucK library to deal with time signatures.
 
-Examples for usage may be found in the test files.
+`ck_timesig` uses ChucK's event and thread (shred) framework.
+Events are broadcast as a measure passes (full beats, half beats, etc.).
+Threads (shreds) are spawned for each performer (instrument) in order to allow parallel execution.
 
 ## Functionality
+
+The library is divided in three main functionalities: time signatures, measures and measure listeners. 
+
+### Time signatures
+The block
 ```
 TimeSignature ts;
 [4] @=> ts.beatsPerMeasure;
@@ -12,7 +19,30 @@ TimeSignature ts;
 ```
 is equivalent to a 4/4 time signature à 120 BPM.
 
+In order for a time signature to be used, its time events must be initialized with the function `init(int levels)`.
+E.g. if only full beats (notes) are going to be listened to, `init(1)` is sufficient. If half beats are also relevant, one must use `init(2)` and so on.
+
+### Measures
+Measures are composed of a time signature and measure listeners.
+Once a measure has a time signature and registered measure listeners, time may be advanced and the measure will be played.
+Each measure listener is perfomed in a separate thread (shred) in order to allow parallel performers.
+
+### Measure listeners
+The class `MeasureListener` may be extended (abstract function `perform` must be implemented).
+This defines a performer which will be played if it is registered at a measure and the measure's time is advanced.
+
 ## Building the lib
 ```
 ant build
 ```
+
+The library is available after a successful build in `build/ChuckLib.ck`.
+
+## Deps
+```
+ChucK <= 1.3.5.1
+Ant
+```
+
+## Examples
+Please check `src/test/test.ck`.
