@@ -69,7 +69,7 @@ class SinOscFrequencyGenerator extends MeasureListener {
 	
 	fun void chuckSinOscToUGen(UGen uGen) {
 		for (0 => int i; i < this.sinOsc.cap(); ++i) {
-            <<< "Chucking " + this.sinOsc[i] + " to UGen " + this.uGens[0] >>>;		
+            <<< "Chucking " + this.sinOsc[i] + " to UGen " + uGen >>>;		
 			1.0 / this.sinOsc.cap() => this.sinOsc[i].gain;
 			this.sinOsc[i] => uGen;
 		}

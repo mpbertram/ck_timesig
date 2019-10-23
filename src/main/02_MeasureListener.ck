@@ -48,4 +48,8 @@ class MeasureListener {
 	fun void waitTwoHundredFiftySixthBeat() {
 		wait(8);
 	}
+	
+	fun void waitFiveHundredTwelfthBeat() {
+		wait(9);
+	}
 }
