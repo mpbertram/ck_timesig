@@ -32,11 +32,24 @@ The class `MeasureListener` may be extended (abstract function `perform` must be
 This defines a performer which will be played if it is registered at a measure and the measure's time is advanced.
 
 ## Building the lib
+
+### Build/test library
+This is the default Ant target, which builds the library and runs tests.
+```
+ant
+```
+In order to just build the library without testing, run
 ```
 ant build
 ```
 
 The library is available after a successful build in `build/ChuckLib.ck`.
+
+### Record test
+```
+ant rec-test
+```
+This produces a `.wav` file in the folder `recs` with the current test recording.
 
 ## Deps
 ```
