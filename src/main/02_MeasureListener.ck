@@ -3,6 +3,8 @@
 class MeasureListener {
     TimeSignature timeSignature;
     
+	fun void onInit() {}
+	fun void onDestroy() {}
     fun pure void perform();
     
     fun void assignTimeSignature(TimeSignature timeSignature) {

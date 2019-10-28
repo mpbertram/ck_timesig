@@ -23,6 +23,7 @@ class Measure {
         Shred shreds[this.registeredListenersCount];
 		
 		for (0 => int i; i < this.registeredListenersCount; ++i) {
+			measureListeners[i].onInit();
 			spork ~ measureListeners[i].perform() @=> shreds[i];
 			<<< "Sporked shred " + shreds[i] >>>;
         }
@@ -31,6 +32,7 @@ class Measure {
 		
 		for (0 => int i; i < this.registeredListenersCount; ++i) {
 			<<< "Killing shred " + shreds[i] >>>;
+			measureListeners[i].onDestroy();
 			shreds[i].exit();
 		}
     }
