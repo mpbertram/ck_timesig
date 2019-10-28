@@ -3,6 +3,7 @@
   <property name="test" location="src/test"/>
   <property name="build" location="build"/>
   <property name="run-test-dir" value="test"/>
+  <property name="recs" location="recs"/>
   
   <target name="clean">
     <delete dir="${build}"/>
@@ -23,16 +24,31 @@
 
   <target name="build" depends="clean,init,compile"/>
   
-  <target name="run-test" depends="build">
+  <target name="assemble-test" depends="build">
     <concat destfile="${run-test-dir}/test.ck">
       <fileset dir="${build}" includes="ChuckLib.ck"/>
 	  <fileset dir="${test}" includes="test.ck"/>
     </concat>
-
-	
-	
+  </target>
+  
+  <target name="run-test" depends="assemble-test">
     <exec executable="chuck">
 	  <arg value="${run-test-dir}/test.ck"/>
+    </exec>
+  </target>
+  
+  <target name="rec-init">
+    <tstamp/>
+    <mkdir dir="${recs}"/>
+  </target>
+  
+  <target name="rec-clean">
+    <delete dir="${recs}"/>
+  </target>
+  
+  <target name="rec-test" depends="rec-init,assemble-test">
+	<exec executable="chuck">
+	  <arg value="rec.ck:${run-test-dir}/test.ck"/>
     </exec>
   </target>
 </project>
