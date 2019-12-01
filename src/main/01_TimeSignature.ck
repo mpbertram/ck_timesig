@@ -68,7 +68,11 @@ class TimeSignature {
         240000 / bpm / beatNoteValue => float delayTimeMs;
         delayTimeMs * timeEvent[levels - 1].timeFraction => float step;
         
-		traverseTree(tree, step);
+		for (0 => int i; i < this.beatsPerMeasure.cap(); ++i) {
+            for (0 => int j; j < this.beatsPerMeasure[i]; ++j) {
+				traverseTree(tree, step);
+			}
+		}
     }
 
 	fun void traverseTree(Tree tree, float step) {
