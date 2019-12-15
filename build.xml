@@ -1,4 +1,4 @@
-<project name="ChuckLib" default="run-test" basedir=".">
+<project name="ck_timesig" default="run-test" basedir=".">
   <property name="src" location="src/main"/>
   <property name="test" location="src/test"/>
   <property name="build" location="build"/>
@@ -13,11 +13,11 @@
   <target name="init">
     <tstamp/>
     <mkdir dir="${build}"/>
-	<mkdir dir="${run-test-dir}"/>
+    <mkdir dir="${run-test-dir}"/>
   </target>
 
   <target name="compile" depends="clean,init">
-    <concat destfile="${build}/ChuckLib.ck">
+    <concat destfile="${build}/ck_timesig.ck">
       <fileset dir="${src}" includes="*.ck"/>
     </concat>
   </target>
@@ -26,14 +26,14 @@
   
   <target name="assemble-test" depends="build">
     <concat destfile="${run-test-dir}/test.ck">
-      <fileset dir="${build}" includes="ChuckLib.ck"/>
-	  <fileset dir="${test}" includes="test.ck"/>
+      <fileset dir="${build}" includes="ck_timesig.ck"/>
+      <fileset dir="${test}" includes="test.ck"/>
     </concat>
   </target>
   
   <target name="run-test" depends="assemble-test">
     <exec executable="chuck">
-	  <arg value="${run-test-dir}/test.ck"/>
+      <arg value="${run-test-dir}/test.ck"/>
     </exec>
   </target>
   
@@ -47,8 +47,8 @@
   </target>
   
   <target name="rec-test" depends="rec-init,assemble-test">
-	<exec executable="chuck">
-	  <arg value="rec.ck:${run-test-dir}/test.ck"/>
+    <exec executable="chuck">
+      <arg value="rec.ck:${run-test-dir}/test.ck"/>
     </exec>
   </target>
 </project>

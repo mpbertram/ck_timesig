@@ -43,7 +43,7 @@ In order to just build the library without testing, run
 ant build
 ```
 
-The library is available after a successful build in `build/ChuckLib.ck`.
+The library is available after a successful build in `build/ck_timesig.ck`.
 
 ### Record test
 ```
