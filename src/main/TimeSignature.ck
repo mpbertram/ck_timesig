@@ -1,7 +1,5 @@
-/* TimeSignature.ck */
-
 class Tree {
-    TimeEvent item;
+    ck_timesig__TimeEvent item;
     
     /* Actually of type Tree (recursive data types not supported) */
     Object left;
@@ -13,21 +11,18 @@ class Tree {
     }
 }
 
-class TimeSignature {
-    10 => int eventLimit;
-    
+public class ck_timesig__TimeSignature {
     int beatsPerMeasure[];
     int beatNoteValue;
     int bpm;
-    int levels;
     
     Tree tree;
     null => tree.left;
     null => tree.right;
     
-    TimeEvent timeEvent[this.eventLimit];
+    ck_timesig__TimeEvent timeEvent[];
 
-    fun Tree insertTree(Tree node, TimeEvent te) {
+    fun Tree insertTree(Tree node, ck_timesig__TimeEvent te) {
         if (node == null) {
             Tree n;
             te @=> n.item;
@@ -43,33 +38,27 @@ class TimeSignature {
     }
 
     fun void init(int levels) {
-        levels => this.levels;
+        ck_timesig__TimeEvent t[levels] @=> timeEvent;
 
-        TimeEvent te;
+        ck_timesig__TimeEvent te;
         1.0 => te.timeFraction;
-        
-        <<< "Initializing " + te.timeFraction + ", " + te >>>;
-        te @=> this.timeEvent[0];
-
+        te @=> timeEvent[0];
         te @=> tree.item;
 
         for (1 => int i; i < levels; ++i) {
-            TimeEvent te;
-            this.timeEvent[i - 1].timeFraction / 2.0 => te.timeFraction;
-
-            <<< "Initializing " + te.timeFraction + ", " + te >>>;
-            te @=> this.timeEvent[i];
-
+            ck_timesig__TimeEvent te;
+            timeEvent[i - 1].timeFraction / 2.0 => te.timeFraction;
+            te @=> timeEvent[i];
             insertTree(tree, te);
         }
     }
      
     fun void advanceTime() {
         240000 / bpm / beatNoteValue => float delayTimeMs;
-        delayTimeMs * timeEvent[levels - 1].timeFraction => float step;
+        delayTimeMs * timeEvent[timeEvent.cap() - 1].timeFraction => float step;
         
-        for (0 => int i; i < this.beatsPerMeasure.cap(); ++i) {
-            for (0 => int j; j < this.beatsPerMeasure[i]; ++j) {
+        for (0 => int i; i < beatsPerMeasure.cap(); ++i) {
+            for (0 => int j; j < beatsPerMeasure[i]; ++j) {
                 traverseTree(tree, step);
             }
         }
@@ -84,12 +73,11 @@ class TimeSignature {
                 step::ms => now;
             }
             
-            <<< "Emitting " + tree.item.timeFraction + ", " + tree.item >>>;
             tree.item.broadcast();
         }
     }
     
-    fun TimeEvent getEvent(int level) {
-        return this.timeEvent[level];
+    fun ck_timesig__TimeEvent getEvent(int level) {
+        return timeEvent[level];
     }
 }

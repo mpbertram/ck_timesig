@@ -1,18 +1,16 @@
-/* MeasureListener.ck */
-
-class MeasureListener {
-    TimeSignature timeSignature;
+public class ck_timesig__MeasureListener {
+    ck_timesig__TimeSignature ts;
     
     fun void onInit() {}
     fun void onDestroy() {}
     fun pure void perform();
     
-    fun void assignTimeSignature(TimeSignature timeSignature) {
-        timeSignature @=> this.timeSignature;
+    fun void assignTimeSignature(ck_timesig__TimeSignature t) {
+        t @=> ts;
     }
     
     fun void wait(int level) {
-        this.timeSignature.getEvent(level) => now;
+        ts.getEvent(level) => now;
     }
     
     fun void waitFullBeat() {

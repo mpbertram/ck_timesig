@@ -1,6 +1,4 @@
-/* test.ck */
-
-class Harmony extends MeasureListener {
+class Harmony extends ck_timesig__MeasureListener {
     SinOsc s[3];
     Envelope e[3];
 
@@ -80,7 +78,7 @@ class EnvelopeProviderWithAdsr extends EnvelopeProvider {
     }   
 }
 
-class Arpeggio extends MeasureListener {
+class Arpeggio extends ck_timesig__MeasureListener {
     float notes[];
     int waits[];
     float gain;
@@ -128,7 +126,7 @@ class Arpeggio extends MeasureListener {
 }
 
 fun void playHarmony() {
-    TimeSignature ts;
+    ck_timesig__TimeSignature ts;
     [440] @=> ts.beatsPerMeasure;
     8 => ts.beatNoteValue;
     80 => ts.bpm;
@@ -136,20 +134,20 @@ fun void playHarmony() {
 
     Harmony h;
 
-    Measure m;
+    ck_timesig__Measure m;
     ts @=> m.ts;
 
     m.register(h);
     m.advanceTime();
 }
 
-TimeSignature ts;
+ck_timesig__TimeSignature ts;
 [5] @=> ts.beatsPerMeasure;
 8 => ts.beatNoteValue;
 65 => ts.bpm;
 ts.init(7);
 
-Measure m;
+ck_timesig__Measure m;
 ts @=> m.ts;
 
 EnvelopeProviderWithAdsr envelopeProvider1;
@@ -201,7 +199,7 @@ for (0 => int i; i < 4; ++i) {
     [0.01, 0.01, 0.02, 0.03, 0.05, 0.08, 0.13, 0.21, 0.34, 0.55, 0.89, 1.44] @=> float fib[];
     0 => int lastChord;
     for (0 => int f; f < 40; ++f) {
-        Measure m;
+        ck_timesig__Measure m;
         ts @=> m.ts;
 
         Arpeggio arpeggio;
@@ -242,7 +240,7 @@ for (0 => int i; i < 4; ++i) {
     [1.44, 0.89, 0.55, 0.34, 0.21, 0.13, 0.08, 0.05, 0.03, 0.02, 0.01, 0.01] @=> float fib[];
     0 => int lastChord;
     for (0 => int f; f < 12; ++f) {
-        Measure m;
+        ck_timesig__Measure m;
         ts @=> m.ts;
 
         Arpeggio arpeggio;

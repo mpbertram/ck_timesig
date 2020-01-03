@@ -1,39 +1,14 @@
 <project name="ck_timesig" default="run-test" basedir=".">
+  <property name="version" value="0.2"/>
+  
+  <property name="test-starter" value="src/test/TestStarter.ck"/>
   <property name="src" location="src/main"/>
-  <property name="test" location="src/test"/>
-  <property name="build" location="build"/>
-  <property name="run-test-dir" value="test"/>
   <property name="recs" location="recs"/>
-  
-  <target name="clean">
-    <delete dir="${build}"/>
-    <delete dir="${run-test-dir}"/>
-  </target>
-  
-  <target name="init">
-    <tstamp/>
-    <mkdir dir="${build}"/>
-    <mkdir dir="${run-test-dir}"/>
-  </target>
+  <property name="dist" location="dist"/>
 
-  <target name="compile" depends="clean,init">
-    <concat destfile="${build}/ck_timesig.ck">
-      <fileset dir="${src}" includes="*.ck"/>
-    </concat>
-  </target>
-
-  <target name="build" depends="clean,init,compile"/>
-  
-  <target name="assemble-test" depends="build">
-    <concat destfile="${run-test-dir}/test.ck">
-      <fileset dir="${build}" includes="ck_timesig.ck"/>
-      <fileset dir="${test}" includes="test.ck"/>
-    </concat>
-  </target>
-  
-  <target name="run-test" depends="assemble-test">
+  <target name="run-test">
     <exec executable="chuck">
-      <arg value="${run-test-dir}/test.ck"/>
+      <arg value="${test-starter}"/>
     </exec>
   </target>
   
@@ -46,9 +21,19 @@
     <delete dir="${recs}"/>
   </target>
   
-  <target name="rec-test" depends="rec-init,assemble-test">
+  <target name="rec-test" depends="rec-init">
     <exec executable="chuck">
-      <arg value="rec.ck:${run-test-dir}/test.ck"/>
+      <arg value="rec.ck:${test-starter}"/>
     </exec>
+  </target>
+
+  <target name="clean-dist">
+    <delete dir="${dist}"/>
+  </target>
+
+  <target name="dist" depends="clean-dist">
+      <zip destfile="${dist}/${ant.project.name}_v${version}.zip">
+        <zipfileset dir="${src}" includes="*.ck"/>
+      </zip>
   </target>
 </project>
