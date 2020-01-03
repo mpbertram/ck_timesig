@@ -31,19 +31,21 @@ Each measure listener is perfomed in a separate thread (shred) in order to allow
 The class `MeasureListener` may be extended (abstract function `perform` must be implemented).
 This defines a performer which will be played if it is registered at a measure and the measure's time is advanced.
 
-## Building the lib
+## Building/testing the lib
 
-### Build/test library
-This is the default Ant target, which builds the library and runs tests.
+### Build 
+In order to build the library, run
+```
+ant dist
+```
+
+The library is available after a successful build in `dist/ck_timesig_<version>.zip`.
+
+### Test library
+This is the default Ant target, so just run
 ```
 ant
 ```
-In order to just build the library without testing, run
-```
-ant build
-```
-
-The library is available after a successful build in `build/ck_timesig.ck`.
 
 ### Record test
 ```
@@ -58,4 +60,4 @@ Ant
 ```
 
 ## Examples
-Please check `src/test/test.ck`.
+Please check `src/test/TestStarter.ck`.
