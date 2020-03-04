@@ -26,7 +26,7 @@ public class ck_timesig__Measure {
         for (0 => int i; i < listenersCount; ++i) {
             measureListeners[i] @=> ck_timesig__MeasureListener ml;
             
-            ml.onInit();
+            ml.prepare();
             spork ~ ml.perform() @=> Shred s;
             
             s @=> shreds[i];
@@ -38,8 +38,13 @@ public class ck_timesig__Measure {
             measureListeners[i] @=> ck_timesig__MeasureListener ml;
             shreds[i] @=> Shred s;
             
-            ml.onDestroy();
-            s.exit();
+            spork ~ destroy(ml, s);
         }
+    }
+    
+    fun void destroy(ck_timesig__MeasureListener ml, Shred s) {
+        ml.tearDownTolerance() => now;
+        ml.tearDown();
+        s.exit();
     }
 }

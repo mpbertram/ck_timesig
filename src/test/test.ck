@@ -2,7 +2,7 @@ class Harmony extends ck_timesig__MeasureListener {
     SinOsc s[3];
     Envelope e[3];
 
-    fun void onInit() {
+    fun void prepare() {
         SinOsc s[3] @=> this.s;
         Envelope e[3] @=> this.e;
 
@@ -14,7 +14,7 @@ class Harmony extends ck_timesig__MeasureListener {
         }
     }
 
-    fun void onDestroy() {
+    fun void tearDown() {
         for (0 => int i; i < s.cap(); ++i) {
             e[i] =< dac;
         }
@@ -89,7 +89,7 @@ class Arpeggio extends ck_timesig__MeasureListener {
     EnvelopeProvider envelopeProvider;
     Envelope e;
 
-    fun void onInit() {
+    fun void prepare() {
         envelopeProvider.get() @=> this.e;
         
         s => NRev r => Gain g => e;
@@ -101,7 +101,7 @@ class Arpeggio extends ck_timesig__MeasureListener {
         e => dac;
     }
 
-    fun void onDestroy() {
+    fun void tearDown() {
         e =< dac;
     }
 

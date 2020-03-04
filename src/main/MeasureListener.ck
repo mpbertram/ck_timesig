@@ -1,9 +1,15 @@
 public class ck_timesig__MeasureListener {
     ck_timesig__TimeSignature ts;
     
-    fun void onInit() {}
-    fun void onDestroy() {}
+    fun dur tearDownTolerance() {
+        return 1::second;
+    }
+    
+    fun void prepare() {}
+
     fun pure void perform();
+    
+    fun void tearDown() {}
     
     fun void assignTimeSignature(ck_timesig__TimeSignature t) {
         t @=> ts;
